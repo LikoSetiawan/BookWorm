@@ -14,7 +14,10 @@ struct ContentView: View {
    
     @Environment (\.modelContext) var modelContext
     
-    @Query var books : [Book]
+    @Query(sort: [
+        SortDescriptor(\Book.title),
+        SortDescriptor(\Book.author)
+    ]) var books: [Book]
     
     @State private var addBookModal = false
     
@@ -36,16 +39,35 @@ struct ContentView: View {
                         }
                     }
                 }
+                .onDelete(perform: deleteBooks)
             }
             .navigationTitle("BookWorm")
             .toolbar{
-                Button("Add", systemImage: "plus"){
-                    addBookModal.toggle()
+                ToolbarItem(placement: .topBarLeading){
+                    EditButton()
+                }
+                ToolbarItem(placement: .topBarTrailing){
+                    Button("Add", systemImage: "plus"){
+                        addBookModal.toggle()
+                    }
                 }
             }
             .sheet(isPresented: $addBookModal){
                 AddBookView()
             }
+            .navigationDestination(for: Book.self){ book in
+                    DetailView(book: book)
+            }
+            
+        }
+    }
+    
+    func deleteBooks(at offsets: IndexSet){
+        for offset in offsets {
+            
+            let book = books[offset]
+            
+            modelContext.delete(book)
         }
     }
 }
