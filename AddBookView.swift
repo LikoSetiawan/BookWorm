@@ -47,15 +47,24 @@ struct AddBookView: View {
                 
                 Section{
                     Button("Add book"){
-                        let addBook = Book(title: title, author: author, genre: genre, review: review, rating: rating)
+                        let addBook = Book(title: title, author: author, genre: genre, review: review, rating: rating, date: Date.now)
                         modelContext.insert(addBook)
                         
                         dismiss()
                     }
                 }
+                .disabled(title.isReallyEmpty || author.isReallyEmpty || review.isReallyEmpty)
             }
             .navigationTitle("Bookworm")
         }
+    }
+}
+
+
+
+extension String{
+    var isReallyEmpty: Bool{
+        self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
 
